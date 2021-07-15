@@ -51,4 +51,17 @@ class DeliveryJobFlowTest < ActionDispatch::IntegrationTest
     assert_equal delivery_job_response['pickup_address'], @delivery_job_other.pickup_address
     assert_equal delivery_job_response['dropoff_address'], @delivery_job_other.dropoff_address
   end
+
+  test 'claim delivery job' do
+    post "/api/delivery_jobs/#{@delivery_job_other.id}/claim", headers: { authorization: "bearer #{@user.generate_jwt}" }, as: :json
+    assert_equal 200, status
+    assert_equal @user.id, response.parsed_body['claimant_id']
+  end
+
+  test 'claim delivery job with claimant' do
+    @delivery_job_other.update(claimant: @user)
+    post "/api/delivery_jobs/#{@delivery_job_other.id}/claim", headers: { authorization: "bearer #{@user.generate_jwt}" }, as: :json
+    assert_equal 422, status
+    assert_equal 'Delivery job has been claimed', response.parsed_body['error']
+  end
 end

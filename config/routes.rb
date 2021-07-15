@@ -7,6 +7,10 @@ Rails.application.routes.draw do
       collection do
         get :others
       end
+
+      member do
+        post :claim
+      end
     end
   end
 end
