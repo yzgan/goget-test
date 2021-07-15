@@ -3,8 +3,9 @@ require "test_helper"
 class DeliveryJobFlowTest < ActionDispatch::IntegrationTest
   setup do
     @user = users(:one)
+    @other_user = users(:two)
     @delivery_job = delivery_jobs(:one)
-    @delivery_job_other = delivery_jobs(:two)
+    @other_delivery_job = delivery_jobs(:two)
   end
 
   test 'create delivery' do
@@ -47,21 +48,35 @@ class DeliveryJobFlowTest < ActionDispatch::IntegrationTest
     assert response.parsed_body['delivery_jobs'].present?
     assert_equal 1, response.parsed_body['delivery_jobs'].size
     delivery_job_response = response.parsed_body['delivery_jobs'][0]
-    assert_equal delivery_job_response['id'], @delivery_job_other.id
-    assert_equal delivery_job_response['pickup_address'], @delivery_job_other.pickup_address
-    assert_equal delivery_job_response['dropoff_address'], @delivery_job_other.dropoff_address
+    assert_equal delivery_job_response['id'], @other_delivery_job.id
+    assert_equal delivery_job_response['pickup_address'], @other_delivery_job.pickup_address
+    assert_equal delivery_job_response['dropoff_address'], @other_delivery_job.dropoff_address
   end
 
   test 'claim delivery job' do
-    post "/api/delivery_jobs/#{@delivery_job_other.id}/claim", headers: { authorization: "bearer #{@user.generate_jwt}" }, as: :json
+    post "/api/delivery_jobs/#{@other_delivery_job.id}/claim", headers: { authorization: "bearer #{@user.generate_jwt}" }, as: :json
     assert_equal 200, status
     assert_equal @user.id, response.parsed_body['claimant_id']
   end
 
   test 'claim delivery job with claimant' do
-    @delivery_job_other.update(claimant: @user)
-    post "/api/delivery_jobs/#{@delivery_job_other.id}/claim", headers: { authorization: "bearer #{@user.generate_jwt}" }, as: :json
+    @other_delivery_job.update(claimant: @user)
+    post "/api/delivery_jobs/#{@other_delivery_job.id}/claim", headers: { authorization: "bearer #{@user.generate_jwt}" }, as: :json
     assert_equal 422, status
     assert_equal 'Delivery job has been claimed', response.parsed_body['error']
+  end
+
+  test 'execute delivery job' do
+    @other_delivery_job.update(claimant: @user)
+    post "/api/delivery_jobs/#{@other_delivery_job.id}/execute", headers: { authorization: "bearer #{@user.generate_jwt}" }, as: :json
+    assert_equal 200, status
+    assert_equal @user.id, response.parsed_body['claimant_id']
+  end
+
+  test 'execute delivery job with other claimant' do
+    @other_delivery_job.update(claimant: @other_user)
+    post "/api/delivery_jobs/#{@other_delivery_job.id}/execute", headers: { authorization: "bearer #{@user.generate_jwt}" }, as: :json
+    assert_equal 422, status
+    assert_equal 'Delivery job not claimed by user', response.parsed_body['error']
   end
 end

@@ -1,6 +1,6 @@
 class DeliveryJobsController < ApplicationController
   before_action :authenticate_user
-  before_action :set_delivery_job, only: %i[claim]
+  before_action :set_delivery_job, only: %i[claim execute]
 
   def index
     @delivery_jobs = current_user.delivery_jobs
@@ -23,6 +23,7 @@ class DeliveryJobsController < ApplicationController
   def claim
     @delivery_job.with_lock do
       return render_error_message('Delivery job has been claimed') if @delivery_job.claimant.present?
+      return render_error_message('Delivery job has been executed') if @delivery_job.executed?
 
       @delivery_job.claimant = current_user
       if @delivery_job.save
@@ -30,6 +31,16 @@ class DeliveryJobsController < ApplicationController
       else
         render json: @delivery_job.errors, status: :unprocessable_entity
       end
+    end
+  end
+
+  def execute
+    return render_error_message('Delivery job not claimed by user') unless @delivery_job.claimant == current_user
+
+    if @delivery_job.update(status: :executed)
+      render @delivery_job
+    else
+      render json: @delivery_job.errors, status: :unprocessable_entity
     end
   end
 
