@@ -8,3 +8,12 @@ one:
   dropoff_latitude: 3.159087720258843
   dropoff_longitude: 101.61367779673941
   user: one
+
+two:
+  pickup_address: Pulau Redang, 21090 Kuala Terengganu, Terengganu
+  pickup_latitude: 5.787792000911108
+  pickup_longitude: 103.00735870631136
+  dropoff_address: Merang jetty, 21010 Kuala Terengganu, Terengganu
+  dropoff_latitude: 5.528436158910942
+  dropoff_longitude: 102.94565449876424
+  user: two

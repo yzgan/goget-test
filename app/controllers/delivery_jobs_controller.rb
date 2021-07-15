@@ -15,6 +15,10 @@ class DeliveryJobsController < ApplicationController
     end
   end
 
+  def others
+    @delivery_jobs = DeliveryJob.where.not(user_id: current_user.id)
+  end
+
   private
 
   def delivery_job_params

@@ -3,6 +3,10 @@ Rails.application.routes.draw do
 
 
   scope :api, defaults: { format: :json } do
-    resources :delivery_jobs
+    resources :delivery_jobs do
+      collection do
+        get :others
+      end
+    end
   end
 end

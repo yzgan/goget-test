@@ -4,6 +4,7 @@ class DeliveryJobFlowTest < ActionDispatch::IntegrationTest
   setup do
     @user = users(:one)
     @delivery_job = delivery_jobs(:one)
+    @delivery_job_other = delivery_jobs(:two)
   end
 
   test 'create delivery' do
@@ -33,9 +34,21 @@ class DeliveryJobFlowTest < ActionDispatch::IntegrationTest
     get '/api/delivery_jobs', headers: { authorization: "bearer #{@user.generate_jwt}" }, as: :json
     assert_equal 200, status
     assert response.parsed_body['delivery_jobs'].present?
+    assert_equal 1, response.parsed_body['delivery_jobs'].size
     delivery_job_response = response.parsed_body['delivery_jobs'][0]
     assert_equal delivery_job_response['id'], @delivery_job.id
     assert_equal delivery_job_response['pickup_address'], @delivery_job.pickup_address
     assert_equal delivery_job_response['dropoff_address'], @delivery_job.dropoff_address
+  end
+
+  test 'view other delivery jobs' do
+    get '/api/delivery_jobs/others', headers: { authorization: "bearer #{@user.generate_jwt}" }, as: :json
+    assert_equal 200, status
+    assert response.parsed_body['delivery_jobs'].present?
+    assert_equal 1, response.parsed_body['delivery_jobs'].size
+    delivery_job_response = response.parsed_body['delivery_jobs'][0]
+    assert_equal delivery_job_response['id'], @delivery_job_other.id
+    assert_equal delivery_job_response['pickup_address'], @delivery_job_other.pickup_address
+    assert_equal delivery_job_response['dropoff_address'], @delivery_job_other.dropoff_address
   end
 end
