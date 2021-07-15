@@ -3,7 +3,7 @@ require "test_helper"
 class UserRegistrationTest < ActionDispatch::IntegrationTest
   # fixtures :users
 
-  test 'user registration' do
+  test 'register successfully' do
     params = {
       user: {
         email: 'user_1@gmail.com',
@@ -17,5 +17,6 @@ class UserRegistrationTest < ActionDispatch::IntegrationTest
     assert_equal params[:user][:name], response.parsed_body['name']
     user = User.find_by(email: params[:user][:email])
     assert_equal user.id, response.parsed_body['id']
+    assert response.parsed_body['token'].present?
   end
 end

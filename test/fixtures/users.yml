@@ -7,3 +7,4 @@
 one: 
   name: ganyz
   email: ganyizhong@gmail.com
+  encrypted_password: <%= User.new.send(:password_digest, 'password') %>
