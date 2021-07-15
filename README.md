@@ -1,6 +1,7 @@
 # Goget Test
 
 ## ERD
+![ERD](erd.png)
 
 ## Admin console
 ```
