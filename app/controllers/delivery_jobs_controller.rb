@@ -1,4 +1,4 @@
-class DeliveryJobsController < ApplicationController
+class DeliveryJobsController < ApiController
   before_action :authenticate_user
   before_action :set_delivery_job, only: %i[claim execute]
 
