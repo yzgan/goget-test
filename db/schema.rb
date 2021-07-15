@@ -10,10 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_14_014044) do
+ActiveRecord::Schema.define(version: 2021_07_15_051826) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "delivery_jobs", force: :cascade do |t|
+    t.string "pickup_address"
+    t.string "pickup_latitude"
+    t.string "pickup_longitude"
+    t.string "dropoff_address"
+    t.string "dropoff_latitude"
+    t.string "dropoff_longitude"
+    t.bigint "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_delivery_jobs_on_user_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -28,4 +41,5 @@ ActiveRecord::Schema.define(version: 2021_07_14_014044) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "delivery_jobs", "users"
 end
