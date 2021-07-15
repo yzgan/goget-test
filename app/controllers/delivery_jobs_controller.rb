@@ -1,6 +1,10 @@
 class DeliveryJobsController < ApplicationController
   before_action :authenticate_user
 
+  def index
+    @delivery_jobs = current_user.delivery_jobs
+  end
+
   def create
     @delivery_job = current_user.delivery_jobs.new(delivery_job_params)
 

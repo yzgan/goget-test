@@ -3,6 +3,7 @@ require "test_helper"
 class DeliveryJobFlowTest < ActionDispatch::IntegrationTest
   setup do
     @user = users(:one)
+    @delivery_job = delivery_jobs(:one)
   end
 
   test 'create delivery' do
@@ -26,5 +27,15 @@ class DeliveryJobFlowTest < ActionDispatch::IntegrationTest
     assert_equal params[:delivery_job][:dropoff_latitude], response.parsed_body['dropoff_latitude']
     assert_equal params[:delivery_job][:dropoff_longitude], response.parsed_body['dropoff_longitude']
     assert_equal @user.id, response.parsed_body['user_id']
+  end
+
+  test 'view my delivery jobs' do
+    get '/api/delivery_jobs', headers: { authorization: "bearer #{@user.generate_jwt}" }, as: :json
+    assert_equal 200, status
+    assert response.parsed_body['delivery_jobs'].present?
+    delivery_job_response = response.parsed_body['delivery_jobs'][0]
+    assert_equal delivery_job_response['id'], @delivery_job.id
+    assert_equal delivery_job_response['pickup_address'], @delivery_job.pickup_address
+    assert_equal delivery_job_response['dropoff_address'], @delivery_job.dropoff_address
   end
 end

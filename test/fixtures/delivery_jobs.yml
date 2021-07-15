@@ -1,19 +1,10 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  pickup_address: MyString
-  pickup_latitude: MyString
-  pickup_longitude: MyString
-  dropoff_address: MyString
-  dropoff_latitude: MyString
-  dropoff_longitude: MyString
+  pickup_address: No. 3, Jalan PJS 11/15, Bandar Sunway, 46150 Petaling Jaya, Selangor
+  pickup_latitude: 3.073018092768752
+  pickup_longitude: 101.60757435644045
+  dropoff_address: No. 2, Jalan PJU 7/2, Mutiara Damansara, 47800 Petaling Jaya, Selangor
+  dropoff_latitude: 3.159087720258843
+  dropoff_longitude: 101.61367779673941
   user: one
-
-two:
-  pickup_address: MyString
-  pickup_latitude: MyString
-  pickup_longitude: MyString
-  dropoff_address: MyString
-  dropoff_latitude: MyString
-  dropoff_longitude: MyString
-  user: two
