@@ -21,17 +21,18 @@ class DeliveryJobsController < ApiController
   end
 
   def claim
-    @delivery_job.with_lock do
-      return render_error_message('Delivery job has been claimed') if @delivery_job.claimant.present?
-      return render_error_message('Delivery job has been executed') if @delivery_job.executed?
+    return render_error_message('Delivery job has been claimed') if @delivery_job.claimant.present?
+    return render_error_message('Delivery job has been executed') if @delivery_job.executed?
 
-      @delivery_job.claimant = current_user
-      if @delivery_job.save
-        render @delivery_job
-      else
-        render json: @delivery_job.errors, status: :unprocessable_entity
-      end
+    @delivery_job.claimant = current_user
+    @delivery_job.lock_version = claim_params[:lock_version]
+    if @delivery_job.save
+      render @delivery_job
+    else
+      render json: @delivery_job.errors, status: :unprocessable_entity
     end
+  rescue ActiveRecord::StaleObjectError
+    render_error_message('Delivery job has been updated some time ago. Please try again')
   end
 
   def execute
@@ -53,6 +54,12 @@ class DeliveryJobsController < ApiController
   def delivery_job_params
     params
       .require(:delivery_job)
-      .permit(:pickup_address, :pickup_latitude, :pickup_longitude, :dropoff_address, :dropoff_latitude, :dropoff_longitude)
+      .permit(:pickup_address, :pickup_latitude, :pickup_longitude, :dropoff_address, :dropoff_latitude, :dropoff_longitude, :lock_version)
+  end
+
+  def claim_params
+    params
+      .require(:delivery_job)
+      .permit(:lock_version)
   end
 end
