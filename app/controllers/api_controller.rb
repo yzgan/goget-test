@@ -1,6 +1,10 @@
 class ApiController < ActionController::API
   respond_to :json
 
+  def current_user
+    @current_user
+  end
+
   private
 
   def authenticate_user
@@ -8,9 +12,8 @@ class ApiController < ActionController::API
       begin
         jwt_payload = JWT.decode(http_token, Rails.application.secrets.secret_key_base).first
         current_user_id = jwt_payload['id']
-        return head :unauthorized unless current_user_id.present?
-
         @current_user = User.find_by(id: current_user_id)
+        return head :unauthorized unless @current_user
       rescue JWT::ExpiredSignature, JWT::VerificationError, JWT::DecodeError
         head :unauthorized
       end
