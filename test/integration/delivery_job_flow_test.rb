@@ -54,14 +54,24 @@ class DeliveryJobFlowTest < ActionDispatch::IntegrationTest
   end
 
   test 'claim delivery job' do
-    post "/api/delivery_jobs/#{@other_delivery_job.id}/claim", headers: { authorization: "bearer #{@user.generate_jwt}" }, as: :json
+    params = {
+      delivery_job: {
+        lock_version: @other_delivery_job.lock_version
+      }
+    }
+    post "/api/delivery_jobs/#{@other_delivery_job.id}/claim", headers: { authorization: "bearer #{@user.generate_jwt}" }, params: params, as: :json
     assert_equal 200, status
     assert_equal @user.id, response.parsed_body['claimant_id']
   end
 
   test 'claim delivery job with claimant' do
+    params = {
+      delivery_job: {
+        lock_version: @other_delivery_job.lock_version
+      }
+    }
     @other_delivery_job.update(claimant: @user)
-    post "/api/delivery_jobs/#{@other_delivery_job.id}/claim", headers: { authorization: "bearer #{@user.generate_jwt}" }, as: :json
+    post "/api/delivery_jobs/#{@other_delivery_job.id}/claim", headers: { authorization: "bearer #{@user.generate_jwt}" }, params: params, as: :json
     assert_equal 422, status
     assert_equal 'Delivery job has been claimed', response.parsed_body['error']
   end
